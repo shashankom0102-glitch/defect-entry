@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defect Entry</title>
+
+<style>
+body {
+  font-family: Arial;
+  padding: 15px;
+}
+input, textarea, button {
+  width: 100%;
+  font-size: 18px;
+  margin-top: 10px;
+  padding: 10px;
+}
+button {
+  background: #1a73e8;
+  color: white;
+  border: none;
+}
+.mic {
+  background: #34a853;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Defect Entry</h2>
+
+<label>Body Number</label>
+<input id="bodyNumber" placeholder="Speak or type">
+
+<button class="mic" onclick="startVoice('bodyNumber')">🎤 Speak Body Number</button>
+
+<label>Defects</label>
+<textarea id="defects" placeholder="Speak or type"></textarea>
+
+<button class="mic" onclick="startVoice('defects')">🎤 Speak Defects</button>
+
+<button onclick="submitData()">SAVE</button>
+
+<p id="status"></p>
+
+<script>
+const apiUrl = "https://script.google.com/macros/s/AKfycbwyL32SUzXYc4CCCX8o6P31zMToEkMxKW75ejtV_aMRzNetNhcyGipJEKMi9lUPh93cgA/exec";
+
+// Voice input
+function startVoice(id) {
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = "en-IN"; // change to ja-JP if needed
+  recognition.onresult = (event) => {
+    document.getElementById(id).value =
+      event.results[0][0].transcript;
+  };
+  recognition.start();
+}
+
+// Submit
+function submitData() {
+  const bodyNumber = document.getElementById("bodyNumber").value;
+  const defects = document.getElementById("defects").value;
+
+  fetch(apiUrl, {
+    method: "POST",
+    body: JSON.stringify({
+      bodyNumber: bodyNumber,
+      defects: defects
+    })
+  })
+  .then(() => {
+    document.getElementById("status").innerText = "Saved ✅";
+    document.getElementById("bodyNumber").value = "";
+    document.getElementById("defects").value = "";
+  })
+  .catch(() => {
+    document.getElementById("status").innerText = "Error ❌";
+  });
+}
+</script>
+
+</body>
+</html>
